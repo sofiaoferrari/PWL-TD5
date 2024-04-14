@@ -5,6 +5,7 @@
 #include <vector>
 #include <cmath>
 #include <limits>
+#include <ctime>
 
 using namespace std;
 
@@ -14,8 +15,8 @@ using namespace std;
 
 //     return a;
 // };
-std::vector<double> f_en_tramo(double x0, double y0, double x1, double y1, const std::vector<double>& x) {
-    std::vector<double> prediccion;
+vector<double> f_en_tramo(double x0, double y0, double x1, double y1, const vector<double>& x) {
+    vector<double> prediccion;
     
     double pendiente = (y1 - y0) / (x1 - x0);
     
@@ -45,36 +46,23 @@ std::vector<double> f_en_tramo(double x0, double y0, double x1, double y1, const
 // };
 
 // Función para estimar el error total de la recta
-double estimar_error_y(const std::vector<std::pair<double, double>>& sol,std::vector<double>& x, std::vector<double>& y) {
-    double error = 0.0;
-    
-    for (size_t i = 0; i < sol.size() - 1; ++i) {
-        std::vector<double> sub_x, sub_y;
-        std::tie(sub_x, sub_y) = subconjunto(x, y, sol[i].first, sol[i + 1].first);
-        std::vector<double> sub_x_np(sub_x.begin(), sub_x.end());
-        std::vector<double> prediccion = f_en_tramo(sol[i].first, sol[i].second, sol[i + 1].first, sol[i + 1].second, sub_x_np);
-        error += calcular_error(prediccion, sub_y);
-    }
-    
-    return error;
-}
 
-double calcular_error(std::vector<double>& vector1, std::vector<double>& vector2) {
+double calcular_error(vector<double>& vector1, vector<double>& vector2) {
     if (vector1.size() != vector2.size()) { 
-        std::cerr << "Error: los vectores tienen diferentes longitudes." << std::endl;
+        cerr << "Error: los vectores tienen diferentes longitudes." << endl;
         return -1; 
     }
 
     double error = 0.0;
     for (size_t i = 0; i < vector1.size(); ++i) {
-        error += std::abs(vector1[i] - vector2[i]);
+        error += abs(vector1[i] - vector2[i]);
     }
     return error;
 }
 
-std::pair<std::vector<double>, std::vector<double>> subconjunto(std::vector<double>& x, std::vector<double>& y, double x0, double x1) {
-    std::vector<double> sub_X;
-    std::vector<double> sub_Y;
+pair<vector<double>, vector<double>> subconjunto(vector<double>& x, vector<double>& y, double x0, double x1) {
+    vector<double> sub_X;
+    vector<double> sub_Y;
     size_t indice_inferior = 0;
     
     // Generamos subconjunto de x entre x0 y x1
@@ -95,17 +83,17 @@ std::pair<std::vector<double>, std::vector<double>> subconjunto(std::vector<doub
         sub_Y.push_back(y[i]);
     }
     
-    return std::make_pair(sub_X, sub_Y); // Retornamos ambos subconjuntos
+    return make_pair(sub_X, sub_Y); // Retornamos ambos subconjuntos
 }
 
 // Función para estimar el error y guardar en un mapa memo para evitar recálculos
-// std::pair<double, std::unordered_map<std::vector<std::pair<double, double>>, double>> estimar_error_y_pd(
-//     const std::vector<std::pair<double, double>>& sol,
-//     std::vector<double>& x,
-//     std::vector<double>& y,
-//     std::unordered_map<std::vector<std::pair<double, double>>, double>& memo) {
+// pair<double, unordered_map<vector<pair<double, double>>, double>> estimar_error_y_pd(
+//     const vector<pair<double, double>>& sol,
+//     vector<double>& x,
+//     vector<double>& y,
+//     unordered_map<vector<pair<double, double>>, double>& memo) {
     
-//     std::vector<std::pair<double, double>> key = sol;
+//     vector<pair<double, double>> key = sol;
     
 //     if (memo.find(key) != memo.end()) {
 //         return {memo[key], memo};
@@ -113,10 +101,10 @@ std::pair<std::vector<double>, std::vector<double>> subconjunto(std::vector<doub
     
 //     double error = 0.0;
 //     for (size_t i = 0; i < sol.size() - 1; ++i) {
-//         std::vector<double> sub_x, sub_y;
-//         std::tie(sub_x, sub_y) = subconjunto(x, y, sol[i].first, sol[i + 1].first);
-//         std::vector<double> sub_x_np(sub_x.begin(), sub_x.end());
-//         std::vector<double> prediccion = f_en_tramo(sol[i].first, sol[i].second, sol[i + 1].first, sol[i + 1].second, sub_x_np);
+//         vector<double> sub_x, sub_y;
+//         tie(sub_x, sub_y) = subconjunto(x, y, sol[i].first, sol[i + 1].first);
+//         vector<double> sub_x_np(sub_x.begin(), sub_x.end());
+//         vector<double> prediccion = f_en_tramo(sol[i].first, sol[i].second, sol[i + 1].first, sol[i + 1].second, sub_x_np);
 //         error += calcular_error(prediccion, sub_y);
 //     }
     
@@ -124,16 +112,32 @@ std::pair<std::vector<double>, std::vector<double>> subconjunto(std::vector<doub
 //     return {error, memo};
 // }
 
-// std::pair<double, std::vector<std::pair<double, double>>> fuerza_bruta(const std::vector<double>& grid_x, const std::vector<double>& grid_y, const std::vector<double>& x, const std::vector<double>& y, size_t N, std::vector<std::pair<double, double>>& sol_parcial) {
+double estimar_error_y(const vector<pair<double, double>>& sol,vector<double>& x, vector<double>& y) {
+    double error = 0.0;
+    
+    for (size_t i = 0; i < sol.size() - 1; ++i) {
+        vector<double> sub_x, sub_y;
+        tie(sub_x, sub_y) = subconjunto(x, y, sol[i].first, sol[i + 1].first);
+        vector<double> sub_x_np(sub_x.begin(), sub_x.end());
+        vector<double> prediccion = f_en_tramo(sol[i].first, sol[i].second, sol[i + 1].first, sol[i + 1].second, sub_x_np);
+        cout << "prediccion:" << ends;
+        error += calcular_error(prediccion, sub_y);
+    }
+    
+    return error;
+}
+
+
+// pair<double, vector<pair<double, double>>> fuerza_bruta(vector<double>& grid_x, vector<double>& grid_y, vector<double>& x, vector<double>& y, size_t N, vector<pair<double, double>>& sol_parcial) {
 //     if (grid_x.size() < N - sol_parcial.size()) {
-//         return {std::numeric_limits<double>::max(), {}};
+//         return {numeric_limits<double>::max(), {}};
 //     } else if (sol_parcial.size() == N) {
 //         double error_actual = estimar_error_y(sol_parcial, x, y);
 //         return {error_actual, sol_parcial};
 //     } else {
-//         std::pair<double, std::vector<std::pair<double, double>>> sol_global = {std::numeric_limits<double>::max(), {}};
+//         pair<double, vector<pair<double, double>>> sol_global = {numeric_limits<double>::max(), {}};
 //         if (N - sol_parcial.size() == 1) {
-//             grid_x = {grid_x.back()};
+//             grid_x.push_back(grid_x.back());
 //         }
 //         for (double i : grid_y) {
 //             sol_parcial.push_back({grid_x[0], i});
@@ -153,13 +157,45 @@ std::pair<std::vector<double>, std::vector<double>> subconjunto(std::vector<doub
 //     }
 // }
 
+pair<double, vector<pair<double, double>>> fuerza_bruta(vector<double>& grid_x, vector<double>& grid_y, vector<double>& x, vector<double>& y, size_t N, vector<pair<double, double>>& sol_parcial) {
+    if (grid_x.size() < N - sol_parcial.size()) {
+        return {numeric_limits<double>::max(), {}};
+    } else if (sol_parcial.size() == N) {
+        double error_actual = estimar_error_y(sol_parcial, x, y);
+        return {error_actual, sol_parcial};
+    } else {
+        pair<double, vector<pair<double, double>>> sol_global = {numeric_limits<double>::max(), {}};
+        if (N - sol_parcial.size() == 1) {
+            grid_x.push_back(grid_x.back());  // Agregar el último elemento de nuevo
+        }
+        vector<double> grid_x_sliced = {grid_x.begin() + 1, grid_x.end()};
+        for (double i : grid_y) {
+            sol_parcial.push_back({grid_x[0], i});
+            auto parcial = fuerza_bruta(grid_x_sliced, grid_y, x, y, N, sol_parcial);
+            if (parcial.first < sol_global.first) {
+                sol_global = parcial;
+            }
+            sol_parcial.pop_back();
+        }
+        if (sol_parcial.size() > 0) {
+            auto parcial = fuerza_bruta(grid_x_sliced, grid_y, x, y, N, sol_parcial);
+            if (parcial.first < sol_global.first) {
+                sol_global = parcial;
+            }
+        }
+        return sol_global;
+    }
+}
+
+
+
 // Para libreria de JSON.
 using namespace nlohmann;
 
 int main(int argc, char** argv) {
-    std::string instance_name = "../../data/titanium.json";
-    std::cout << "Reading file " << instance_name << std::endl;
-    std::ifstream input(instance_name);
+    string instance_name = "../../data/titanium.json";
+    cout << "Reading file " << instance_name << endl;
+    ifstream input(instance_name);
 
     json instance;
     input >> instance;
@@ -170,23 +206,29 @@ int main(int argc, char** argv) {
     int n = 6;
     int N = 5;
 
-    std::cout << K << std::endl;
+    //cout << K << endl;
 
     // Aca empieza la magia.
 
     // Ejemplo para guardar json.
     // Probamos guardando el mismo JSON de instance, pero en otro archivo.
-    std::ofstream output("test_output.out");
+    ofstream output("test_output.out");
 
     ////////////////////FUERZA BRUTA///////////
-    // std::vector<std::pair<double, double>> sol_parcial;
+    // vector<pair<double, double>> sol_parcial;
     // auto resultado = fuerza_bruta(grid_x, grid_y, x, y, N, sol_parcial);
-    // std::cout << "Error mínimo estimado: " << resultado.first << std::endl;
-    // std::cout << "Puntos correspondientes: ";
+    // cout << "Error mínimo estimado: " << resultado.first << endl;
+    // cout << "Puntos correspondientes: ";
     // for (const auto& punto : resultado.second) {
-    //     std::cout << "(" << punto.first << ", " << punto.second << ") ";
+    //     cout << "(" << punto.first << ", " << punto.second << ") ";
     // }
-    // std::cout << std::endl;
+    // cout << endl;
+    vector<pair<double, double>> sol = { {1.0, 1.0}, {3.0, 3.0}, {6.0, 6.0} };
+    vector<double> x = {1.0, 2.0, 3.0, 4.5, 5.0};
+    vector<double> y = {1.0, 0.0, 3.0, 3.0, 5.2};
+    double error = estimar_error_y(sol, x, y);
+    cout << "Error estimado: " << error << endl;
+
 
     output << instance;
     output.close();

@@ -9,12 +9,7 @@
 
 using namespace std;
 
-// double f_en_tramo(double x0, double y0, double x1, double y1, sdouble x){
-    
-//     double a = (((y1-y0)/(x1-x0))*(x-x0)) + y0;
 
-//     return a;
-// };
 vector<double> f_en_tramo(double x0, double y0, double x1, double y1, const vector<double>& x) {
     vector<double> prediccion;
     
@@ -27,23 +22,7 @@ vector<double> f_en_tramo(double x0, double y0, double x1, double y1, const vect
     return prediccion;
 }
 
-// double estimar_error_y(sol,x,y){
 
-//     int i = 0;
-//     double error = 0;
-
-//     while (i < (sol.size()-1)){
-
-//         vector<double> sub_x, sub_y;
-//         tie(sub_x, sub_y) = subconjunto(x, y, sol[i].first, sol[i+1].first);
-//         vector<double> prediccion = f_en_tramo(sol[i].first, sol[i].second, sol[i+1].first, sol[i+1].second, sub_x);
-//         error = error + calcular_error(prediccion, sub_y);
-//         i = i + 1;
-//     }
-
-//     return error;
-    
-// };
 
 // Función para estimar el error total de la recta
 
@@ -120,42 +99,11 @@ double estimar_error_y(const vector<pair<double, double>>& sol,vector<double>& x
         tie(sub_x, sub_y) = subconjunto(x, y, sol[i].first, sol[i + 1].first);
         vector<double> sub_x_np(sub_x.begin(), sub_x.end());
         vector<double> prediccion = f_en_tramo(sol[i].first, sol[i].second, sol[i + 1].first, sol[i + 1].second, sub_x_np);
-        cout << "prediccion:" << ends;
         error += calcular_error(prediccion, sub_y);
     }
     
     return error;
 }
-
-
-// pair<double, vector<pair<double, double>>> fuerza_bruta(vector<double>& grid_x, vector<double>& grid_y, vector<double>& x, vector<double>& y, size_t N, vector<pair<double, double>>& sol_parcial) {
-//     if (grid_x.size() < N - sol_parcial.size()) {
-//         return {numeric_limits<double>::max(), {}};
-//     } else if (sol_parcial.size() == N) {
-//         double error_actual = estimar_error_y(sol_parcial, x, y);
-//         return {error_actual, sol_parcial};
-//     } else {
-//         pair<double, vector<pair<double, double>>> sol_global = {numeric_limits<double>::max(), {}};
-//         if (N - sol_parcial.size() == 1) {
-//             grid_x.push_back(grid_x.back());
-//         }
-//         for (double i : grid_y) {
-//             sol_parcial.push_back({grid_x[0], i});
-//             auto parcial = fuerza_bruta({grid_x.begin() + 1, grid_x.end()}, grid_y, x, y, N, sol_parcial);
-//             if (parcial.first < sol_global.first) {
-//                 sol_global = parcial;
-//             }
-//             sol_parcial.pop_back();
-//         }
-//         if (sol_parcial.size() > 0) {
-//             auto parcial = fuerza_bruta({grid_x.begin() + 1, grid_x.end()}, grid_y, x, y, N, sol_parcial);
-//             if (parcial.first < sol_global.first) {
-//                 sol_global = parcial;
-//             }
-//         }
-//         return sol_global;
-//     }
-// }
 
 pair<double, vector<pair<double, double>>> fuerza_bruta(vector<double>& grid_x, vector<double>& grid_y, vector<double>& x, vector<double>& y, size_t N, vector<pair<double, double>>& sol_parcial) {
     if (grid_x.size() < N - sol_parcial.size()) {
@@ -166,7 +114,7 @@ pair<double, vector<pair<double, double>>> fuerza_bruta(vector<double>& grid_x, 
     } else {
         pair<double, vector<pair<double, double>>> sol_global = {numeric_limits<double>::max(), {}};
         if (N - sol_parcial.size() == 1) {
-            grid_x.push_back(grid_x.back());  // Agregar el último elemento de nuevo
+            grid_x = {(grid_x.back())};
         }
         vector<double> grid_x_sliced = {grid_x.begin() + 1, grid_x.end()};
         for (double i : grid_y) {
